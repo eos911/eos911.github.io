@@ -5,7 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
           integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+    <link rel="manifest" href="/img/site.webmanifest">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="msapplication-config" content="/img/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+    <meta property="og:image:width" content="1293">
+    <meta property="og:image:height" content="677">
+    <meta property="og:title" content="EOS 911 Emergency">
+    <meta property="og:description" content="Prove ownership of a hacked EOS account on the genesis snapshot">
+    <meta property="og:url" content="https://recovery.eos911.io/">
+    <meta property="og:image" content="https://recovery.eos911.io/img/og-image.jpg">
+    <meta name="description" content="Prove ownership of a hacked EOS account on the genesis snapshot">
+
     <title>EOS911 Emergency</title>
+
     <script src="js/web3.min.js"></script>
     <script src="js/eosjs-ecc.js"></script>
     <script>
@@ -101,20 +119,21 @@
     </script>
 </head>
 <body>
+
+
 <div class="jumbotron jumbotron-fluid">
     <div class="container">
-        <h1 class="display-4">EOS911 Emergency</h1>
+        <img class="logo" src="img/logo_transparent.png"/>
         <hr class="my-4">
         <p class="lead">Prove ownership of a hacked eos account on the genesis snapshot</p>
-        <p class="lead">Made by <a href="https://eosrio.io/">EOSRIO</a>, <a href="https://eos42.io/">EOS42</a>, <a href="https://eosdac.io/">EOSDAC</a>, <a href="https://eossweden.se">EOSSW/eden</a>, <a href="https://www.hkeos.com">HKEOS</a>, <a href="https://blockmatrix.network">Blockmatrix</a></p>
+        <p class="lead">Made by <a href="https://eosrio.io/">EOSRIO</a>, <a href="https://eos42.io/">EOS42</a>, <a
+                href="https://eosdac.io/">EOSDAC</a>, <a href="https://eossweden.se">EOSSW/eden</a>, <a
+                href="https://www.hkeos.com">HKEOS</a>, <a href="https://blockmatrix.network">Block Matrix</a> and <a
+                href="https://eostribe.io/">EOS Tribe</a></p>
+        <p class="lead">View the code on <a href="https://github.com/eos911/eos911.github.io">Github</a></p>
     </div>
-
-
-
-
-
-
 </div>
+
 <div class="container" id="mm_wait" style="opacity: 0" hidden>
     <div class="alert alert-primary" role="alert">
         Waiting for Metamask
@@ -154,7 +173,6 @@
         </div>
         <button type="button" onclick="register()" class="btn btn-primary mb-2">Submit</button>
     </form>
-    <br>
     <div class="card">
         <div class="card-header" id="headingOne">
             <h5 class="mb-0">
