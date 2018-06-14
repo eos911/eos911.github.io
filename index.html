@@ -6,10 +6,10 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
           integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
     <title>EOS911 Emergency</title>
-    <script src="web3.min.js"></script>
-    <script src="eos.js"></script>
+    <script src="js/web3.min.js"></script>
+    <script src="js/eosjs-ecc.js"></script>
     <script>
-        const {ecc} = Eos.modules;
+        let ecc = eosjs_ecc;
         let publicKey = '';
         let ready = false;
         let localWeb3;
@@ -112,7 +112,7 @@
 
 
 
-    
+
 
 </div>
 <div class="container" id="mm_wait" style="opacity: 0" hidden>
@@ -168,7 +168,7 @@
             <div class="card-body">
                 <form>
                     <div class="mb-3">
-                        <button type="button" onclick="genKeyPair()" class="btn btn-primary">Generate using eos.js
+                        <button type="button" onclick="genKeyPair()" class="btn btn-primary">Generate using eosjs-ecc
                         </button>
                     </div>
                     <div class="input-group mb-3">
