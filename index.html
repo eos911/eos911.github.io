@@ -1,15 +1,11 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
           integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/styles.css">
     <title>EOS911 Emergency</title>
-
     <script src="web3.min.js"></script>
     <script src="eos.js"></script>
     <script>
@@ -17,40 +13,8 @@
         let publicKey = '';
         let ready = false;
         let localWeb3;
-        window.addEventListener('load', function () {
-            if (typeof web3 !== 'undefined') {
-                localWeb3 = new Web3(web3.currentProvider);
-                localWeb3.version.getNetwork((err, netId) => {
-                    if (netId !== "1") {
-                        console.log('Please connect to the Ethereum mainnet!')
-                    } else {
-                        ready = true;
-                        document.getElementById('mm_true').hidden = false;
-                        setTimeout(() => {
-                            document.getElementById('mm_true').hidden = true;
-                        }, 3000);
-                        const coinbase = localWeb3.eth.coinbase;
-                        console.log(coinbase);
-                    }
-                });
-                console.log(localWeb3);
-            } else {
-                console.log('Web3 Not supported! Please use a web3 ready browser!');
-                document.getElementById('mm_false').hidden = false;
-            }
-        });
-
-        function genKeyPair() {
-            ecc.initialize().then(() => {
-                ecc.randomKey().then(privateKey => {
-                    document.getElementById("new_private_gen").value = privateKey;
-                    publicKey = ecc.privateToPublic(privateKey);
-                    document.getElementById("new_public_gen").value = publicKey;
-                    document.getElementById("EOSpublicKEY").value = publicKey;
-                });
-            });
-        }
-
+        let registrationContract;
+        const address = '0x71f2ea939984349838578fbd20fd25e649c1d6a3';
         const abi = [{
             "anonymous": false,
             "inputs": [{"indexed": false, "name": "user", "type": "address"}, {
@@ -78,17 +42,60 @@
             "type": "function"
         }];
 
-        const address = '0x71f2ea939984349838578fbd20fd25e649c1d6a3';
+        window.addEventListener('load', function () {
+            if (typeof web3 !== 'undefined') {
+                localWeb3 = new Web3(web3.currentProvider);
+                localWeb3.version['getNetwork']((err, netId) => {
+                    if (netId !== "1") {
+                        console.log('Please connect to the Ethereum mainnet!')
+                    } else {
+                        ready = true;
+                        localWeb3.eth.defaultAccount = address;
+                        const regContract = localWeb3.eth.contract(abi);
+                        registrationContract = regContract.at(address);
+                    }
+                });
+                console.log(localWeb3);
+            } else {
+                console.log('Web3 Not supported! Please use a web3 ready browser!');
+                document.getElementById('mm_false').hidden = false;
+            }
+        });
 
-        function initContract(contract) {
-            const RecoverEosKey = contract(abi);
-            const miniToken = RecoverEosKey.at(address);
-            listenForClicks(miniToken)
+        function genKeyPair() {
+            ecc.initialize().then(() => {
+                ecc.randomKey().then(privateKey => {
+                    document.getElementById("new_private_gen").value = privateKey;
+                    publicKey = ecc.privateToPublic(privateKey);
+                    document.getElementById("new_public_gen").value = publicKey;
+                    document.getElementById("EOSpublicKEY").value = publicKey;
+                });
+            });
         }
 
         function register() {
             if (ready) {
-
+                const registrationKey = document.getElementById("EOSpublicKEY").value;
+                if (ecc.isValidPublic(registrationKey)) {
+                    document.getElementById("mainContainer").style.opacity = "0";
+                    document.getElementById("mm_wait").hidden = false;
+                    document.getElementById("mm_wait").style.opacity = "1";
+                    registrationContract['register'](registrationKey, (err, data) => {
+                        document.getElementById("mainContainer").style.opacity = "1";
+                        document.getElementById("mm_wait").hidden = true;
+                        document.getElementById("mm_wait").style.opacity = "0";
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            const baseUrl = "https://etherscan.io/tx/";
+                            document.getElementById("tx_confirm").hidden = false;
+                            document.getElementById("tx_link").setAttribute("href", baseUrl + data);
+                            document.getElementById("tx_link").innerText = baseUrl + data;
+                        }
+                    });
+                } else {
+                    alert("Invalid Public Key!");
+                }
             }
         }
     </script>
@@ -97,16 +104,22 @@
 <div class="jumbotron jumbotron-fluid">
     <div class="container">
         <h1 class="display-4">EOS911 Emergency</h1>
+        <hr class="my-4">
         <p class="lead">Prove ownership of a hacked eos account on the genesis snapshot</p>
     </div>
 </div>
-<div class="container">
+<div class="container" id="mm_wait" style="opacity: 0" hidden>
+    <div class="alert alert-primary" role="alert">
+        Waiting for Metamask
+    </div>
+</div>
+<div class="container" id="mainContainer">
+    <div hidden id="tx_confirm" class="alert alert-primary" role="alert">
+        <a href="https://etherscan.io/tx/" id="tx_link" target="_blank"></a>
+    </div>
     <div hidden id="mm_false" class="alert alert-danger" role="alert">
         Your browser is not Web3 compatible, please install <a href="https://metamask.io/" target="_blank"
                                                                class="alert-link">Metamask</a> to continue.
-    </div>
-    <div hidden id="mm_true" class="alert alert-success" role="alert">
-        Metamask detected!
     </div>
     <p style="font-size: large">
         By following the process on this website, you confirm that your <strong>EOS private key</strong> was compromised
@@ -123,8 +136,8 @@
         <a target="_blank"
            href="https://github.com/EOS-Mainnet/governance/blob/master/eosio.system/eosio.system-clause-constitution-rc.md">eosio.system-clause-constitution-rc.md</a>
     </p>
-    <form>
-        <div class="input-group mb-3">
+    <form class="form-inline">
+        <div class="input-group mb-2 mx-sm-3" style="width: 50%">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="basic-addon1">EOS Public Key</span>
             </div>
@@ -132,34 +145,45 @@
                    aria-label="New EOS Public Key"
                    aria-describedby="basic-addon1">
         </div>
-        <button type="button" onclick="register()" class="btn btn-primary">Submit</button>
+        <button type="button" onclick="register()" class="btn btn-primary mb-2">Submit</button>
     </form>
     <br>
     <div class="card">
-        <h5 class="card-header">Generate new keypair</h5>
-        <div class="card-body">
-            <form>
-                <div class="mb-3">
-                    <button type="button" onclick="genKeyPair()" class="btn btn-primary">Generate using eos.js</button>
-                </div>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" id="new_public">EOS Public</span>
+        <div class="card-header" id="headingOne">
+            <h5 class="mb-0">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne"
+                        aria-expanded="true" aria-controls="collapseOne">
+                    Generate new keypair
+                </button>
+            </h5>
+        </div>
+        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+            <div class="card-body">
+                <form>
+                    <div class="mb-3">
+                        <button type="button" onclick="genKeyPair()" class="btn btn-primary">Generate using eos.js
+                        </button>
                     </div>
-                    <input type="text" id="new_public_gen" readonly class="form-control" aria-label="New EOS Public Key"
-                           aria-describedby="new_public">
-                </div>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" id="new_private">EOS Private</span>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="new_public">EOS Public</span>
+                        </div>
+                        <input type="text" id="new_public_gen" readonly class="form-control"
+                               aria-label="New EOS Public Key"
+                               aria-describedby="new_public">
                     </div>
-                    <input type="text" id="new_private_gen" readonly class="form-control"
-                           aria-describedby="new_private">
-                </div>
-                <div class="alert alert-danger" role="alert">
-                    Remember to backup your private key somewhere safe, you won't have access to it again!
-                </div>
-            </form>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="new_private">EOS Private</span>
+                        </div>
+                        <input type="text" id="new_private_gen" readonly class="form-control"
+                               aria-describedby="new_private">
+                    </div>
+                    <div class="alert alert-danger" role="alert">
+                        Remember to backup your private key somewhere safe, you won't have access to it again!
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
